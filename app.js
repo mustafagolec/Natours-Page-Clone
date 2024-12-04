@@ -34,7 +34,8 @@ app.get('/api/v1/tours/:id', (req, res) => {
   const id = req.params.id * 1;
   const tour = tours.find((el) => el.id === id);
 
-  if (!tour) { //id > tours.length can be used instead
+  if (!tour) {
+    //id > tours.length can be used instead
     return res.status(404).json({
       status: 'fail',
       message: 'Invalid ID',
@@ -70,6 +71,21 @@ app.post('/api/v1/tours', (req, res) => {
       });
     }
   );
+});
+
+app.patch('/api/v1/tours/:id', (req, res) => {
+  if (req.params.id * 1 > tours.length) {  //*1 is for converting to number
+    return res.status(404).json({
+      status: 'fail',
+      message: 'Invalid ID',
+    });
+  }
+  res.status(200).json({
+    status: 'success',
+    data: {
+      tour: '<Updated tour here...>',
+    },
+  });
 });
 
 const port = 3000;
