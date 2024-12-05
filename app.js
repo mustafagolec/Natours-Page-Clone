@@ -2,16 +2,29 @@ const fs = require('fs');
 const express = require('express');
 
 const app = express();
-
 app.use(express.json());
+
+app.use((req, res, next) => {
+  //building our own middleware
+  console.log('Hello from the Middleware!');
+  next();
+});
+
+app.use((req, res, next) => {
+  req.requestTime = new Date().toISOString();
+  next();
+});
 
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
 );
 
 const getAllTours = (req, res) => {
+  console.log(req.requestTime);
+
   res.status(200).json({
     status: 'success',
+    requestedAt: req.requestTime,
     results: tours.length,
     data: {
       tours,
@@ -98,11 +111,15 @@ const deleteTour = (req, res) => {
 app.get('/api/v1/tours/:id', getTour);
 app.post('/api/v1/tours', createTour);
 app.patch('/api/v1/tours/:id', updateTour);
-app.delete('/api/v1/tours/:id', deleteTour); */  //simplified routes
+app.delete('/api/v1/tours/:id', deleteTour); */ //simplified routes
 
-app.route('/api/v1/tours').get(getAllTours).post(createTour);   //simplified simplified routes
+app.route('/api/v1/tours').get(getAllTours).post(createTour); //simplified simplified routes
 
-app.route('/api/v1/tours/:id').get(getTour).patch(updateTour).delete(deleteTour);
+app
+  .route('/api/v1/tours/:id')
+  .get(getTour)
+  .patch(updateTour)
+  .delete(deleteTour);
 
 const port = 3000;
 app.listen(port, () => {
